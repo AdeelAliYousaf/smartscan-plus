@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Collapsible } from '@/components/ui/collapsible';
 import { ExternalLink } from '@/components/external-link';
@@ -10,6 +11,15 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
 
 export default function TabTwoScreen() {
+  const resetOnboarding = async () => {
+    try {
+      await AsyncStorage.removeItem('@onboarding_complete');
+      Alert.alert('Success', 'Onboarding reset! Please restart the app or go to Home tab to see the onboarding slider again.');
+    } catch (error) {
+      Alert.alert('Error', 'Failed to reset onboarding');
+    }
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -31,6 +41,13 @@ export default function TabTwoScreen() {
         </ThemedText>
       </ThemedView>
       <ThemedText>This app includes example code to help you get started.</ThemedText>
+      
+      <TouchableOpacity 
+        style={styles.resetButton}
+        onPress={resetOnboarding}
+      >
+        <ThemedText style={styles.resetButtonText}>Reset Onboarding (Debug)</ThemedText>
+      </TouchableOpacity>
       <Collapsible title="File-based routing">
         <ThemedText>
           This app has two screens:{' '}
@@ -108,5 +125,17 @@ const styles = StyleSheet.create({
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+  },
+  resetButton: {
+    backgroundColor: '#4A90E2',
+    padding: 16,
+    borderRadius: 12,
+    marginVertical: 16,
+    alignItems: 'center',
+  },
+  resetButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
