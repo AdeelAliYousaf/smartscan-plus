@@ -1,50 +1,175 @@
-# Welcome to your Expo app 👋
+# 🩺 SmartScan+
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**AI-powered early health screening — fast, accessible, and reliable.**
 
-## Get started
+SmartScan+ is a modern mobile health screening platform that uses **computer vision and AI** to detect **anemia indicators (eyes & fingernails)** and **skin lesions**, combined with **real-time verified doctor chat** for instant medical guidance.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## ✨ Why SmartScan+
 
-2. Start the app
+Healthcare screening is often **late, expensive, and inaccessible**. SmartScan+ flips that.
 
-   ```bash
-   npx expo start
-   ```
+* 📱 **Mobile-first** — works on everyday smartphones
+* ⚡ **Instant AI screening** — results in seconds
+* 🧠 **Clinically-inspired models** — trained on medical datasets
+* 👨‍⚕️ **Real-time doctor chat** — human verification when it matters
+* 🌍 **Scalable for developing regions** — low-cost & remote-friendly
 
-In the output, you'll find options to open the app in a
+No labs. No waiting. No guesswork.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🔍 Core Features
 
-## Get a fresh project
+### 🧪 Anemia Screening
 
-When you're ready, run:
+* Eye (conjunctiva) analysis
+* Fingernail color assessment
+* AI risk-level estimation (Low / Medium / High)
 
-```bash
-npm run reset-project
+### 🧬 Skin Lesion Detection
+
+* Multi-class skin lesion classification
+* Early risk flagging (non-diagnostic)
+* Image-based AI inference
+
+### 💬 Real-Time Doctor Chat
+
+* Secure messaging with verified doctors
+* AI results shared directly with clinicians
+* Follow-up guidance & next steps
+
+### 🔐 Privacy & Security
+
+* Encrypted image uploads
+* No permanent image storage (configurable)
+* GDPR-inspired data handling principles
+
+---
+
+## 🏗️ Tech Stack
+
+### 📱 Frontend
+
+* **React Native (Expo)**
+* Modern UI components
+* Smooth onboarding & accessibility-first design
+
+### 🧠 AI / ML
+
+* Python
+* TensorFlow / PyTorch
+* CNN-based medical image models
+* Transfer learning for efficiency
+
+### 🌐 Backend
+
+* Node.js / FastAPI
+* PostgreSQL
+* REST APIs
+* WebSockets for real-time chat
+
+### ☁️ Infrastructure (Planned)
+
+* Cloud-based model inference
+* Scalable deployment
+* Secure authentication (JWT)
+
+---
+
+## 🧩 System Architecture (High-Level)
+
+```text
+Mobile App
+   │
+   ├── Image Capture
+   ├── AI Inference API
+   │       └── ML Models
+   │
+   ├── Results Engine
+   │
+   └── Real-Time Doctor Chat
+           └── Verified Clinicians
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🚀 Getting Started
 
-To learn more about developing your project with Expo, look at the following resources:
+### Prerequisites
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+* Node.js ≥ 18
+* Python ≥ 3.9
+* Expo CLI
+* PostgreSQL
 
-## Join the community
+### Clone the Repository
 
-Join our community of developers creating universal apps.
+```bash
+git clone https://github.com/your-username/smartscan-plus.git
+cd smartscan-plus
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Run Mobile App
+
+```bash
+npm install
+npx expo start
+```
+
+### Backend (Example)
+
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+---
+
+## ⚠️ Medical Disclaimer
+
+SmartScan+ **does not provide medical diagnoses**.
+
+* AI results are **screening indicators only**
+* Always consult a licensed medical professional
+* Doctor chat is advisory, not a replacement for clinical visits
+
+---
+
+## 🎯 Roadmap
+
+* [ ] Improve anemia model accuracy
+* [ ] Expand skin lesion dataset (7+ balanced classes)
+* [ ] Add offline inference (edge AI)
+* [ ] Multilingual support (Urdu / English)
+* [ ] Clinical validation studies
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit clean, documented code
+4. Open a pull request
+
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## 🌟 Vision
+
+> *Early detection should not depend on wealth, location, or luck.*
+
+SmartScan+ aims to make **preventive healthcare universal**, using technology responsibly and impactfully.
+
+---
+
+**SmartScan+ — Scan Smart. Act Early. Live Better.**
