@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import MorphTransition from '@/components/morph-transition';
+import AuthOverlay from '@/components/auth-overlay';
+import { useAuth } from '@/contexts/auth-context';
 
 const { width } = Dimensions.get('window');
 
@@ -63,6 +65,7 @@ export default function ProfileScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
+  const { isAuthenticated, signInWithGoogle, registerAsProfessional } = useAuth();
 
   // --- Dynamic Styles ---
   const bgStyle = { backgroundColor: isDark ? '#0F0F13' : '#F2F6F9' };
@@ -120,6 +123,7 @@ export default function ProfileScreen() {
         style={[styles.container, bgStyle]}
         showsVerticalScrollIndicator={false}
         bounces={false}
+        scrollEnabled={isAuthenticated}
       >
       {/* 1. Header Profile Section */}
       <View style={styles.headerContainer}>
@@ -211,7 +215,12 @@ export default function ProfileScreen() {
             <ThemedText style={styles.versionText}>Version 2.4.0 (Build 202)</ThemedText>
         </View>
       </View>
+
       </ScrollView>
+      {/* Authentication Overlay */}
+      {!isAuthenticated && (
+        <AuthOverlay onGoogleLogin={signInWithGoogle} onProfessionalRegister={registerAsProfessional} />
+      )}
     </MorphTransition>
   );
 }

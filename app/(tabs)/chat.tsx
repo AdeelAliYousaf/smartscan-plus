@@ -15,6 +15,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import MorphTransition from '@/components/morph-transition';
+import AuthOverlay from '@/components/auth-overlay';
+import { useAuth } from '@/contexts/auth-context';
 
 const { width } = Dimensions.get('window');
 
@@ -56,6 +58,7 @@ export default function ChatScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const [searchQuery, setSearchQuery] = useState('');
+  const { isAuthenticated, signInWithGoogle, registerAsProfessional } = useAuth();
 
   // Enhanced Mock Data
   const mockChats = [
@@ -150,6 +153,7 @@ export default function ChatScreen() {
         style={styles.content}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        scrollEnabled={isAuthenticated}
       >
         <View style={styles.listHeader}>
           <ThemedText style={styles.sectionTitle}>Recent</ThemedText>
@@ -229,6 +233,11 @@ export default function ChatScreen() {
           <Ionicons name="create-outline" size={28} color="#FFF" />
         </LinearGradient>
       </TouchableOpacity>
+
+      {/* Authentication Overlay */}
+      {!isAuthenticated && (
+        <AuthOverlay onGoogleLogin={signInWithGoogle} onProfessionalRegister={registerAsProfessional} />
+      )}
       </View>
     </MorphTransition>
   );

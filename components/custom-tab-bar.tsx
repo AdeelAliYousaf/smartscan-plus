@@ -31,12 +31,12 @@ import { ColorValue } from 'react-native';
 
 const getColors = (isDark: boolean) => ({
   background: isDark ? '#1a1a1e' : '#ffffff',
-  activeBall: isDark ? 'rgba(140, 134, 252, 0.15)' : 'rgba(0, 99, 238, 0.29)',
+  activeBall: isDark ? '#1a1a1e' : '#ffffff',
   activeIcon: isDark ? '#398bffff' : '#0067eeff',
   inactiveIcon: '#888888',
   text: isDark ? '#888888' : '#888888',
   shadow: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-  scanGradient: ['#0e2551ff', '#4b6fa2ff'] as [ColorValue, ColorValue],
+  scanGradient: ['#0e2551ff', 'rgb(39, 104, 255)'] as [ColorValue, ColorValue],
 });
 
 // --- Animations ---

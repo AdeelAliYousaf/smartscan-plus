@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   Dimensions,
+  Image,
   Animated,
   Platform,
 } from 'react-native';
@@ -136,7 +137,10 @@ export default function HomeScreen() {
             <ThemedText style={styles.heroTitle}>SmartScan+</ThemedText>
           </View>
           <TouchableOpacity style={styles.profileButton}>
-            <Ionicons name="person-circle-outline" size={40} color="rgba(255,255,255,0.8)" />
+            <Image
+                source={require('@/assets/images/logo.png')}
+                style={styles.logoImage}
+              />
           </TouchableOpacity>
         </View>
 
@@ -301,6 +305,11 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+  logoImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 16,
+  },
   container: {
     flex: 1,
   },
