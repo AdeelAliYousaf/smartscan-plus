@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 
 interface OnboardingContextType {
   showOnboarding: boolean;
@@ -21,7 +21,7 @@ export const OnboardingProvider = ({ children }: { children: ReactNode }) => {
     try {
       const value = await AsyncStorage.getItem('@onboarding_complete');
       if (value !== null) {
-        setShowOnboarding(false);
+        setShowOnboarding(true);
       }
     } catch (error) {
       console.error('Error checking onboarding status:', error);

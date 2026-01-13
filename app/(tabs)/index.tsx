@@ -1,19 +1,19 @@
+import HeroSection from '@/components/hero-section';
+import MorphTransition from '@/components/morph-transition';
+import { ThemedText } from '@/components/themed-text';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import React, { useEffect, useRef } from 'react';
 import {
-  StyleSheet,
-  ScrollView,
-  View,
-  TouchableOpacity,
-  Dimensions,
-  Image,
   Animated,
-  Platform,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from '@/components/themed-text'; // Assuming these exist from your snippet
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import MorphTransition from '@/components/morph-transition';
 
 const { width } = Dimensions.get('window');
 
@@ -65,7 +65,7 @@ interface FeatureCardProps {
 
 const FeatureCard = ({ icon, title, description, color, isDark }: FeatureCardProps) => (
   <TouchableOpacity
-    activeOpacity={0.9}
+    activeOpacity={0.5}
     style={[
       styles.featureCard,
       { backgroundColor: isDark ? '#1E1E2E' : '#FFFFFF' },
@@ -125,46 +125,7 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingBottom: 100 }} // Space for bottom tab bar
       >
       {/* Hero Section */}
-      <LinearGradient
-        colors={isDark ? ['#1a1a2e', '#0f0f1e'] : ['#4A90E2', '#357ABD']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.heroSection}
-      >
-        <View style={styles.heroHeader}>
-          <View>
-            <ThemedText style={styles.greetingText}>Welcome back</ThemedText>
-            <ThemedText style={styles.heroTitle}>SmartScan+</ThemedText>
-          </View>
-          <TouchableOpacity style={styles.profileButton}>
-            <Image
-                source={require('@/assets/images/logo.png')}
-                style={styles.logoImage}
-              />
-          </TouchableOpacity>
-        </View>
-
-        <ThemedText style={styles.heroSubtitle}>
-          Medical-grade AI screening assistant at your fingertips.
-        </ThemedText>
-
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <ThemedText style={styles.statValue}>98%</ThemedText>
-            <ThemedText style={styles.statLabel}>Accuracy</ThemedText>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <ThemedText style={styles.statValue}>24/7</ThemedText>
-            <ThemedText style={styles.statLabel}>Available</ThemedText>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <ThemedText style={styles.statValue}>ISO</ThemedText>
-            <ThemedText style={styles.statLabel}>Certified</ThemedText>
-          </View>
-        </View>
-      </LinearGradient>
+      <HeroSection isDark={isDark} />
 
       {/* Floating Disclaimer Card - UX Improvement: Make it distinct but not aggressive */}
       <FadeInView delay={100} style={styles.disclaimerWrapper}>
@@ -206,16 +167,30 @@ export default function HomeScreen() {
           />
           <FeatureCard
             icon="eye-outline"
-            title="Anemia Detect"
+            title="Anemia Detection"
             description="Non-invasive anemia screening via eye conjunctiva analysis."
             color="#9B59B6"
             isDark={isDark}
           />
           <FeatureCard
-            icon="pulse-outline"
-            title="Vitals Monitor"
-            description="Track health trends and historical screening data."
+            icon="chatbubbles-outline"
+            title="Real Time Chat with Doctors"
+            description="Instant access to certified dermatologists & hematologists."
             color="#3498DB"
+            isDark={isDark}
+          />
+          <FeatureCard
+            icon="pulse-outline"
+            title="Screening Reports"
+            description="Comprehensive reports for your health records."
+            color="#27AE60"
+            isDark={isDark}
+          />
+          <FeatureCard
+            icon="alert-circle-outline"
+            title="Risk Assessment"
+            description="Check your risk levels based on AI analysis."
+            color="#F39C12"
             isDark={isDark}
           />
         </ScrollView>
@@ -249,6 +224,40 @@ export default function HomeScreen() {
           ))}
         </View>
       </FadeInView>
+
+{/* --- Anemia Detection Section --- */}
+<FadeInView delay={600} style={styles.sectionContainer}>
+  <ThemedText style={styles.sectionTitle}>Anemia Detection</ThemedText>
+  <ThemedText style={styles.sectionSubtitle}>
+    Our AI analyzes eye conjunctiva images to provide preliminary anemia screening.
+  </ThemedText>
+
+  <View style={styles.gridContainer}>
+    {[
+      { name: 'Normal', type: 'No Risk', color: '#2E7D32' },
+      { name: 'Mild Anemia', type: 'Low Risk', color: '#F39C12' },
+      { name: 'Moderate Anemia', type: 'Medium Risk', color: '#E67E22' },
+      { name: 'Severe Anemia', type: 'High Risk', color: '#C62828' },
+    ].map((item, index) => (
+      <View key={index} style={[styles.gridItem, { backgroundColor: cardBg }]}>
+        <View style={[styles.gridDot, { backgroundColor: item.color }]} />
+        <View>
+          <ThemedText style={styles.gridTitle}>{item.name}</ThemedText>
+          <ThemedText style={[styles.gridSubtitle, { color: item.color }]}>
+            {item.type}
+          </ThemedText>
+        </View>
+      </View>
+    ))}
+  </View>
+
+  <ThemedText style={[styles.disclaimerBody, { marginTop: 8 }]}>
+    Note: Anemia detection is preliminary and for demonstration purposes. Always consult a healthcare professional for diagnosis.
+  </ThemedText>
+</FadeInView>
+
+
+
 
       {/* Timeline Layout for Process - UX Improvement: Clear flow */}
       <FadeInView delay={500} style={styles.sectionContainer}>
@@ -284,6 +293,7 @@ export default function HomeScreen() {
         <TouchableOpacity 
           style={styles.primaryButton}
           activeOpacity={0.8}
+          onPress={() => router.push('/(tabs)/scan')}
         >
           <LinearGradient
             colors={['#4A90E2', '#357ABD']}
@@ -312,68 +322,6 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-  },
-  // Hero
-  heroSection: {
-    paddingTop: 60,
-    paddingBottom: 50,
-    paddingHorizontal: 24,
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  heroHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  greetingText: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  heroTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  profileButton: {
-    padding: 4,
-  },
-  heroSubtitle: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    opacity: 0.9,
-    marginBottom: 30,
-    lineHeight: 24,
-    maxWidth: '90%',
-  },
-  statsRow: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 16,
-    padding: 16,
-    justifyContent: 'space-between',
-    backdropFilter: 'blur(10px)', // Works on Web, ignored on native
-  },
-  statItem: {
-    alignItems: 'center',
-    flex: 1,
-  },
-  statDivider: {
-    width: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    height: '80%',
-  },
-  statValue: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  statLabel: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 12,
-    marginTop: 4,
   },
   // Disclaimer
   disclaimerWrapper: {

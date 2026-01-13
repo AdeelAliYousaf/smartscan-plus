@@ -1,17 +1,18 @@
-import React, { useState, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  Animated,
-  FlatList,
-  ViewToken,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { ThemedText } from './themed-text';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  Animated,
+  Dimensions,
+  FlatList,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  ViewToken
+} from 'react-native';
+import { ThemedText } from './themed-text';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -21,6 +22,8 @@ interface SlideData {
   title: string;
   description: string;
   details?: string;
+  color: string;
+  colorDark: string;
 }
 
 const slides: SlideData[] = [
@@ -28,38 +31,59 @@ const slides: SlideData[] = [
     id: '1',
     icon: 'medical-outline',
     title: 'Welcome to SmartScan+',
-    description: 'AI-Powered Health Screening Assistant',
-    details: 'Advanced technology to help you monitor your health and make informed decisions about when to seek professional medical care.',
+    description: 'AI-Powered Skin Lesion & Anemia Screening',
+    details: 'SmartScan+ uses advanced technology to help you monitor skin lesions and anemia safely and effectively.',
+    color: '#1565C0',      // Deep trustworthy blue
+    colorDark: '#1976D2',
   },
   {
     id: '2',
-    icon: 'alert-circle-outline',
+    icon: 'shield-checkmark-outline',
     title: 'Important Notice',
-    description: 'Screening Tool, Not Diagnostic Device',
-    details: 'SmartScan+ provides preliminary health screening only. Results are not a substitute for professional medical diagnosis. Always consult qualified healthcare providers.',
+    description: 'Screening Tool Only',
+    details: 'SmartScan+ provides preliminary results. Always consult licensed healthcare professionals for diagnosis and treatment.',
+    color: '#EF6C00',      // Orange for caution/warning
+    colorDark: '#FF9800',
   },
   {
     id: '3',
     icon: 'body-outline',
     title: 'Skin Lesion Screening',
-    description: '7 Types of Skin Conditions',
-    details: 'Screen for melanoma, basal cell carcinoma, actinic keratosis, and other skin lesions. Early detection through regular monitoring.',
+    description: 'Monitor 7 Common Conditions',
+    details: 'Early detection of melanoma, basal cell carcinoma, actinic keratosis, and other skin lesions can save lives.',
+    color: '#6A1B9A',      // Purple for clinical sophistication
+    colorDark: '#8E24AA',
   },
   {
     id: '4',
     icon: 'eye-outline',
     title: 'Anemia Detection',
-    description: 'Conjunctiva Image Analysis',
-    details: 'Screen for potential anemia through advanced AI analysis of conjunctiva images using validated medical algorithms.',
+    description: 'Conjunctiva Analysis Made Simple',
+    details: 'SmartScan+ screens for potential anemia using validated AI analysis of eye images with medical-grade accuracy.',
+    color: '#C62828',      // Red for alert, health attention
+    colorDark: '#8c2e2e',
   },
   {
     id: '5',
     icon: 'people-outline',
-    title: 'Professional Consultation',
-    description: 'Book Appointments & Get Expert Care',
-    details: 'Use screening results as a guide to discuss with your healthcare provider. Schedule appointments directly through the app for proper diagnosis and treatment.',
+    title: 'Connect with Experts',
+    description: 'Book Consultations Easily',
+    details: 'Share your screening results with healthcare providers and schedule appointments directly through the app.',
+    color: '#2E7D32',      // Green for trust, growth, health
+    colorDark: '#388E3C',
   },
+  {
+    id: '6',
+    icon: 'lock-closed-outline',
+    title: 'Your Privacy Matters',
+    description: 'Data Security & Confidentiality',
+    details: 'We prioritize your privacy with end-to-end encryption and strict data protection policies. Your health data is secure with us.',
+    color: '#455A64',      // Slate gray for security/reliability
+    colorDark: '#607D8B',
+  },
+
 ];
+
 
 interface OnboardingSliderProps {
   onComplete: () => void;
@@ -72,25 +96,186 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
-  const fadeAnim = useRef(new Animated.Value(0)).current;
+  // Animation values for icon animations
+  const blinkAnim = useRef(new Animated.Value(1)).current; // For blinking eyes
+  const rotateAnim = useRef(new Animated.Value(0)).current; // For unlocking lock
+  const pulseAnim = useRef(new Animated.Value(1)).current; // For pulsing icons
+  const scaleAnim = useRef(new Animated.Value(1)).current; // For logo scaling
+  const swayAnim = useRef(new Animated.Value(0)).current; // For body/people swaying
+  const breatheAnim = useRef(new Animated.Value(1)).current; // For shield breathing
+  
+  // Content animation
+  const contentFadeAnim = useRef(new Animated.Value(0)).current;
+  const contentSlideAnim = useRef(new Animated.Value(50)).current;
 
-  React.useEffect(() => {
-    Animated.timing(fadeAnim, {
+  useEffect(() => {
+    // Reset animations
+    contentFadeAnim.setValue(0);
+    contentSlideAnim.setValue(50);
+    blinkAnim.setValue(1);
+    rotateAnim.setValue(0);
+    pulseAnim.setValue(1);
+    scaleAnim.setValue(1);
+    swayAnim.setValue(0);
+    breatheAnim.setValue(1);
+
+    // Determine animation based on current slide
+    const animationSequence: Animated.CompositeAnimation[] = [];
+
+    // Icon animation based on slide index
+    switch (currentIndex) {
+      case 0: // Logo - scale pulse
+        animationSequence.push(
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(scaleAnim, {
+                toValue: 1.1,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 1000,
+                useNativeDriver: true,
+              }),
+            ])
+          )
+        );
+        break;
+      case 1: // Shield - breathing/pulse effect
+        animationSequence.push(
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(breatheAnim, {
+                toValue: 0.85,
+                duration: 1200,
+                useNativeDriver: true,
+              }),
+              Animated.timing(breatheAnim, {
+                toValue: 1,
+                duration: 1200,
+                useNativeDriver: true,
+              }),
+            ])
+          )
+        );
+        break;
+      case 2: // Body - gentle sway
+        animationSequence.push(
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(swayAnim, {
+                toValue: 1,
+                duration: 800,
+                useNativeDriver: true,
+              }),
+              Animated.timing(swayAnim, {
+                toValue: -1,
+                duration: 800,
+                useNativeDriver: true,
+              }),
+              Animated.timing(swayAnim, {
+                toValue: 0,
+                duration: 800,
+                useNativeDriver: true,
+              }),
+            ])
+          )
+        );
+        break;
+      case 3: // Eye - blink effect
+        animationSequence.push(
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(blinkAnim, {
+                toValue: 0.3,
+                duration: 150,
+                useNativeDriver: true,
+                delay: 2000,
+              }),
+              Animated.timing(blinkAnim, {
+                toValue: 1,
+                duration: 150,
+                useNativeDriver: true,
+              }),
+            ])
+          )
+        );
+        break;
+      case 4: // People - wave/sway effect
+        animationSequence.push(
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(swayAnim, {
+                toValue: 1,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+              Animated.timing(swayAnim, {
+                toValue: -1,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+              Animated.timing(swayAnim, {
+                toValue: 0,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+            ])
+          )
+        );
+        break;
+      case 5: // Lock - unlock and lock rotation
+        animationSequence.push(
+          Animated.loop(
+            Animated.sequence([
+              Animated.timing(rotateAnim, {
+                toValue: 1,
+                duration: 600,
+                useNativeDriver: true,
+                delay: 2000,
+              }),
+              Animated.timing(rotateAnim, {
+                toValue: 0,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+            ])
+          )
+        );
+        break;
+    }
+
+    // Animate content in
+    Animated.timing(contentFadeAnim, {
       toValue: 1,
-      duration: 600,
+      duration: 500,
       useNativeDriver: true,
+      delay: 300,
     }).start();
+
+    Animated.spring(contentSlideAnim, {
+      toValue: 0,
+      tension: 50,
+      friction: 8,
+      useNativeDriver: true,
+      delay: 300,
+    }).start();
+
+    // Start icon animation if available
+    if (animationSequence.length > 0) {
+      Animated.parallel(animationSequence).start();
+    }
+
+    return () => {
+      // Cleanup animations
+      animationSequence.forEach(anim => anim.stop?.());
+    };
   }, [currentIndex]);
 
   const viewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    if (viewableItems.length > 0) {
-      setCurrentIndex(viewableItems[0].index || 0);
-      fadeAnim.setValue(0);
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }).start();
+    if (viewableItems.length > 0 && viewableItems[0].index !== null) {
+      setCurrentIndex(viewableItems[0].index);
     }
   }).current;
 
@@ -98,7 +283,10 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
 
   const scrollTo = () => {
     if (currentIndex < slides.length - 1) {
-      slidesRef.current?.scrollToIndex({ index: currentIndex + 1 });
+      slidesRef.current?.scrollToIndex({ 
+        index: currentIndex + 1,
+        animated: true,
+      });
     } else {
       handleComplete();
     }
@@ -114,83 +302,179 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
     }
   };
 
+  const onScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+    { useNativeDriver: false }
+  );
+
   const renderSlide = ({ item, index }: { item: SlideData; index: number }) => {
-    const isWarningSlide = index === 1;
+    const isActive = index === currentIndex;
+    const accentColor = isDark ? item.colorDark : item.color;
     
+    const inputRange = [
+      (index - 1) * SCREEN_WIDTH,
+      index * SCREEN_WIDTH,
+      (index + 1) * SCREEN_WIDTH,
+    ];
+
+    // Subtle parallax
+    const scale = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.92, 1, 0.92],
+      extrapolate: 'clamp',
+    });
+
+    const opacity = scrollX.interpolate({
+      inputRange,
+      outputRange: [0.3, 1, 0.3],
+      extrapolate: 'clamp',
+    });
+
+    // Icon-specific animations
+    const blinkScale = blinkAnim.interpolate({
+      inputRange: [0.3, 1],
+      outputRange: [0.5, 1],
+    });
+
+    const unlockRotation = rotateAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '-25deg'],
+    });
+
+    const pulseScale = pulseAnim.interpolate({
+      inputRange: [0.8, 1],
+      outputRange: [0.8, 1],
+    });
+
+    const logoScale = scaleAnim.interpolate({
+      inputRange: [1, 1.1],
+      outputRange: [1, 1.1],
+    });
+
+    const swayRotate = swayAnim.interpolate({
+      inputRange: [-1, 0, 1],
+      outputRange: ['-8deg', '0deg', '8deg'],
+    });
+
+    const breatheScale = breatheAnim.interpolate({
+      inputRange: [0.85, 1],
+      outputRange: [0.85, 1],
+    });
+
     return (
-      <View style={[styles.slide, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
-        <Animated.View style={[styles.slideContent, { opacity: fadeAnim }]}>
-          {/* Icon Container */}
-          <View style={[
+      <Animated.View 
+        style={[
+          styles.slide,
+          {
+            opacity,
+            transform: [{ scale }],
+          }
+        ]}
+      >
+        <View style={styles.slideContent}>
+          {/* Icon/Image with custom animations */}
+          <Animated.View style={[
             styles.iconContainer,
-            { 
-              backgroundColor: isWarningSlide 
-                ? (isDark ? '#332200' : '#FFF8E1')
-                : (isDark ? '#1a2332' : '#E3F2FD'),
-              borderColor: isWarningSlide
-                ? (isDark ? '#664400' : '#FFE082')
-                : (isDark ? '#2d4a6e' : '#90CAF9'),
+            {
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+              borderColor: `${accentColor}20`,
             }
           ]}>
-            <Ionicons 
-              name={item.icon} 
-              size={72} 
-              color={isWarningSlide 
-                ? (isDark ? '#FFB300' : '#F57C00')
-                : (isDark ? '#4A90E2' : '#1976D2')
-              } 
-            />
-          </View>
+            {/* Subtle glow */}
+            <View style={[
+              styles.iconGlow,
+              { backgroundColor: accentColor, opacity: 0.1 }
+            ]} />
+            
+            {index === 0 ? (
+              // First slide - Logo image
+              <Animated.Image
+                source={require('@/assets/images/logo.png')}
+                style={[styles.logoImage, { transform: [{ scale: logoScale }] }]}
+              />
+            ) : (
+              // Other slides - Icon with animations
+              <Animated.View
+                style={[
+                  {
+                    transform: [
+                      { 
+                        scale: index === 1 ? breatheScale : index === 3 ? blinkScale : 1
+                      },
+                      { 
+                        rotate: index === 2 || index === 4 ? swayRotate : index === 5 ? unlockRotation : '0deg'
+                      },
+                    ],
+                  }
+                ]}
+              >
+                <Ionicons 
+                  name={item.icon} 
+                  size={56} 
+                  color={accentColor} 
+                />
+              </Animated.View>
+            )}
+          </Animated.View>
 
-          {/* Progress Indicator */}
-          <View style={styles.progressContainer}>
-            <ThemedText style={[styles.progressText, { color: isDark ? '#888888' : '#666666' }]}>
-              {index + 1} / {slides.length}
-            </ThemedText>
-          </View>
+          {/* Content with fade and slide animation - Always rendered but hidden until active */}
+          <Animated.View style={[
+            styles.textContainer,
+            {
+              opacity: isActive ? contentFadeAnim : new Animated.Value(0),
+              transform: [{ translateY: isActive ? contentSlideAnim : new Animated.Value(50) }],
+              pointerEvents: isActive ? 'auto' : 'none',
+            }
+          ]}>
+            <View style={styles.badge}>
+              <ThemedText style={[
+                styles.badgeText,
+                { color: isDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.4)' }
+              ]}>
+                {index + 1} of {slides.length}
+              </ThemedText>
+            </View>
 
-          {/* Content */}
-          <View style={styles.textContainer}>
             <ThemedText style={[
               styles.slideTitle,
-              { color: isDark ? '#ffffff' : '#1a1a1a' }
+              { color: isDark ? '#FFFFFF' : '#000000' }
             ]}>
               {item.title}
             </ThemedText>
             
             <ThemedText style={[
               styles.slideDescription,
-              { 
-                color: isWarningSlide
-                  ? (isDark ? '#FFB300' : '#F57C00')
-                  : (isDark ? '#4A90E2' : '#1976D2')
-              }
+              { color: accentColor }
             ]}>
               {item.description}
             </ThemedText>
 
             <View style={[
               styles.divider,
-              { backgroundColor: isDark ? '#333333' : '#e0e0e0' }
+              { backgroundColor: `${accentColor}30` }
             ]} />
 
             <ThemedText style={[
               styles.slideDetails,
-              { color: isDark ? '#b0b0b0' : '#555555' }
+              { color: isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)' }
             ]}>
               {item.details}
             </ThemedText>
-          </View>
-        </Animated.View>
-      </View>
+          </Animated.View>
+        </View>
+      </Animated.View>
     );
   };
 
   const Pagination = () => {
     return (
       <View style={styles.paginationContainer}>
-        {slides.map((_, index) => {
-          const inputRange = [(index - 1) * SCREEN_WIDTH, index * SCREEN_WIDTH, (index + 1) * SCREEN_WIDTH];
+        {slides.map((slide, index) => {
+          const inputRange = [
+            (index - 1) * SCREEN_WIDTH, 
+            index * SCREEN_WIDTH, 
+            (index + 1) * SCREEN_WIDTH
+          ];
 
           const dotWidth = scrollX.interpolate({
             inputRange,
@@ -204,6 +488,8 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
             extrapolate: 'clamp',
           });
 
+          const accentColor = isDark ? slide.colorDark : slide.color;
+
           return (
             <Animated.View
               key={index.toString()}
@@ -212,7 +498,7 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
                 {
                   width: dotWidth,
                   opacity,
-                  backgroundColor: isDark ? '#4A90E2' : '#1976D2',
+                  backgroundColor: accentColor,
                 },
               ]}
             />
@@ -222,33 +508,38 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
     );
   };
 
+  const currentColor = isDark ? slides[currentIndex].colorDark : slides[currentIndex].color;
+
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#ffffff' }]}>
-      <View style={styles.flatListContainer}>
-        <FlatList
-          ref={slidesRef}
-          data={slides}
-          renderItem={renderSlide}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          pagingEnabled
-          bounces={false}
-          keyExtractor={(item) => item.id}
-          onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
-            useNativeDriver: false,
-          })}
-          scrollEventThrottle={32}
-          onViewableItemsChanged={viewableItemsChanged}
-          viewabilityConfig={viewConfig}
-        />
-      </View>
+    <View style={[styles.container, { backgroundColor: isDark ? '#000000' : '#FFFFFF' }]}>
+      {/* Subtle gradient overlay */}
+      <View style={[
+        styles.gradientOverlay,
+        { backgroundColor: `${currentColor}05` }
+      ]} />
+
+      <FlatList
+        ref={slidesRef}
+        data={slides}
+        renderItem={renderSlide}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        pagingEnabled
+        bounces={false}
+        keyExtractor={(item) => item.id}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        onViewableItemsChanged={viewableItemsChanged}
+        viewabilityConfig={viewConfig}
+        decelerationRate="fast"
+      />
 
       {/* Bottom Navigation */}
       <View style={[
         styles.bottomContainer,
         { 
-          backgroundColor: isDark ? '#0a0a0a' : '#f8f9fa',
-          borderTopColor: isDark ? '#222222' : '#e0e0e0',
+          backgroundColor: isDark ? '#000000' : '#FFFFFF',
+          borderTopColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)',
         }
       ]}>
         <Pagination />
@@ -259,11 +550,11 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
               <TouchableOpacity 
                 style={styles.skipButton} 
                 onPress={handleComplete} 
-                activeOpacity={0.7}
+                activeOpacity={0.6}
               >
                 <ThemedText style={[
                   styles.skipText,
-                  { color: isDark ? '#888888' : '#666666' }
+                  { color: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)' }
                 ]}>
                   Skip
                 </ThemedText>
@@ -272,26 +563,26 @@ export default function OnboardingSlider({ onComplete }: OnboardingSliderProps) 
               <TouchableOpacity 
                 style={[
                   styles.nextButton,
-                  { backgroundColor: isDark ? '#1a4a7a' : '#1976D2' }
+                  { backgroundColor: currentColor }
                 ]}
                 onPress={scrollTo} 
-                activeOpacity={0.8}
+                activeOpacity={0.85}
               >
-                <ThemedText style={styles.nextText}>Next</ThemedText>
-                <Ionicons name="arrow-forward" size={20} color="#ffffff" />
+                <ThemedText style={styles.buttonText}>Continue</ThemedText>
+                <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
               </TouchableOpacity>
             </>
           ) : (
             <TouchableOpacity 
               style={[
                 styles.getStartedButton,
-                { backgroundColor: isDark ? '#1a4a7a' : '#1976D2' }
+                { backgroundColor: currentColor }
               ]}
               onPress={handleComplete} 
-              activeOpacity={0.8}
+              activeOpacity={0.85}
             >
-              <ThemedText style={styles.getStartedText}>Get Started</ThemedText>
-              <Ionicons name="checkmark-circle-outline" size={24} color="#ffffff" />
+              <Ionicons name="checkmark-circle" size={22} color="#FFFFFF" />
+              <ThemedText style={styles.buttonText}>Get Started</ThemedText>
             </TouchableOpacity>
           )}
         </View>
@@ -304,23 +595,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  flatListContainer: {
-    flex: 1,
+  gradientOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
   },
   slide: {
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
-    paddingTop: 60,
-    paddingBottom: 180,
   },
   slideContent: {
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    maxWidth: 480,
+    maxWidth: 440,
   },
   iconContainer: {
     width: 140,
@@ -330,45 +619,62 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 48,
     borderWidth: 2,
+    position: 'relative',
   },
-  progressContainer: {
-    marginBottom: 24,
+  iconGlow: {
+    position: 'absolute',
+    width: 100,
+    height: 100,
+    borderRadius: 50,
   },
-  progressText: {
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 1,
+  logoImage: {
+    width: 120,
+    height: 120,
+    resizeMode: 'contain',
   },
   textContainer: {
     alignItems: 'center',
     width: '100%',
+  },
+  badge: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginBottom: 20,
+  },
+  badgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   slideTitle: {
     fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
     marginBottom: 12,
-    lineHeight: 36,
     letterSpacing: -0.5,
+    lineHeight: 34,
   },
   slideDescription: {
     fontSize: 16,
     textAlign: 'center',
     fontWeight: '600',
-    marginBottom: 20,
-    letterSpacing: 0.3,
+    marginBottom: 24,
+    letterSpacing: 0.2,
   },
   divider: {
-    width: 60,
-    height: 3,
+    width: 50,
+    height: 4,
     borderRadius: 2,
-    marginVertical: 20,
+    marginBottom: 24,
   },
   slideDetails: {
     fontSize: 15,
     textAlign: 'center',
     lineHeight: 24,
-    letterSpacing: 0.2,
+    letterSpacing: 0.1,
+    paddingHorizontal: 8,
   },
   bottomContainer: {
     position: 'absolute',
@@ -376,50 +682,48 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     paddingHorizontal: 24,
-    paddingVertical: 32,
+    paddingTop: 24,
+    paddingBottom: Platform.OS === 'ios' ? 44 : 28,
     borderTopWidth: 1,
   },
   paginationContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
+    height: 20,
   },
   dot: {
-    height: 6,
-    borderRadius: 3,
+    height: 8,
+    borderRadius: 4,
     marginHorizontal: 4,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 16,
   },
   skipButton: {
     paddingVertical: 14,
     paddingHorizontal: 24,
   },
   skipText: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '500',
   },
   nextButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
     paddingHorizontal: 28,
-    borderRadius: 12,
+    borderRadius: 28,
     gap: 8,
-    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-  },
-  nextText: {
-    fontSize: 16,
-    color: '#ffffff',
-    fontWeight: '600',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
   getStartedButton: {
     flex: 1,
@@ -427,17 +731,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 28,
     gap: 10,
-    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  getStartedText: {
-    fontSize: 17,
-    color: '#ffffff',
+  buttonText: {
+    fontSize: 16,
+    color: '#FFFFFF',
     fontWeight: '600',
   },
 });

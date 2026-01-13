@@ -1,19 +1,18 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef } from 'react';
 import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
   Animated,
   Dimensions,
   Platform,
-  Text,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import Svg, { Path } from 'react-native-svg';
 
 // --- Constants & Configuration ---
 const { width } = Dimensions.get('window');
@@ -223,6 +222,10 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
     profile: { icon: 'person', label: 'Profile' },
   };
 
+  // Check if on doctor registration screen
+  const currentRoute = state.routes[state.index]?.name;
+  const isHidden = currentRoute === 'doctor-register' || currentRoute === 'doctor-login';
+
   // Smooth slide animation for the curve and the ball
   useEffect(() => {
     Animated.spring(animatedIndex, {
@@ -272,6 +275,11 @@ export const CustomTabBar: React.FC<CustomTabBarProps> = ({
     inputRange: Array.from({ length: TAB_COUNT }, (_, i) => i),
     outputRange: Array.from({ length: TAB_COUNT }, (_, i) => getPath(i)),
   });
+
+  // Return empty view if hidden
+  if (isHidden) {
+    return <View style={{ height: 0 }} />;
+  }
 
   // Interpolate the Floating Ball Position
   const ballTranslateX = animatedIndex.interpolate({

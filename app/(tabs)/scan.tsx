@@ -1,19 +1,17 @@
-import React, { useRef, useEffect, useState } from 'react';
+import MorphTransition from '@/components/morph-transition';
+import { ThemedText } from '@/components/themed-text';
+import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import React, { useEffect, useRef } from 'react';
 import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
   Animated,
   Dimensions,
-  Platform,
-  ImageBackground,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { ThemedText } from '@/components/themed-text';
-import { Ionicons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { LinearGradient } from 'expo-linear-gradient';
-import MorphTransition from '@/components/morph-transition';
 
 const { width } = Dimensions.get('window');
 
@@ -259,7 +257,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     gap: 6,
-    backdropFilter: 'blur(10px)',
+    // backdropFilter is not supported in React Native
   },
   permissionText: {
     color: '#FFF',
