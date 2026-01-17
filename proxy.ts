@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'; // Note: If deployment fails, you may need to use 'jose' library for Edge Runtime
+
+// CRITICAL: This file must be named "middleware.ts" and placed in the ROOT of your project 
+// (or inside src/ if you use a src folder). DO NOT place it inside pages/ or app/.
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production';
 
-// List of public routes that don't require authentication
+// List of public routes
 const publicRoutes = [
   '/',
   '/about',
@@ -14,28 +17,34 @@ const publicRoutes = [
   '/api/auth/logout',
 ];
 
-export function middleware(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('auth-token')?.value;
 
-  // Allow public routes
-  if (publicRoutes.some(route => pathname.startsWith(route))) {
-    // Redirect authenticated users away from login page
+  // 1. Check if the current path is a public route
+  // FIX: We handle '/' strictly so it doesn't match '/admin'
+  const isPublicRoute = publicRoutes.some(route => 
+    route === '/' ? pathname === route : pathname.startsWith(route)
+  );
+
+  // 2. Handle Public Routes
+  if (isPublicRoute) {
+    // If user is already logged in and tries to access login page, redirect to admin
     if (pathname === '/auth/login' && token) {
       try {
         jwt.verify(token, JWT_SECRET);
         return NextResponse.redirect(new URL('/admin', request.url));
       } catch (error) {
-        // Token is invalid, clear it
-        const response = NextResponse.redirect(new URL('/auth/login', request.url));
-        response.cookies.set('auth-token', '', { maxAge: 0, path: '/' });
+        // Token is invalid, let them stay on login page but clear the cookie
+        const response = NextResponse.next();
+        response.cookies.delete('auth-token');
         return response;
       }
     }
     return NextResponse.next();
   }
 
-  // Protect private routes
+  // 3. Protect Admin and Dashboard Routes
   if (pathname.startsWith('/admin') || pathname.startsWith('/dashboard')) {
     if (!token) {
       return NextResponse.redirect(new URL('/auth/login', request.url));
@@ -45,30 +54,23 @@ export function middleware(request: NextRequest) {
       jwt.verify(token, JWT_SECRET);
       return NextResponse.next();
     } catch (error) {
-      // Token is invalid or expired, redirect to login
+      // Token is invalid or expired
       const response = NextResponse.redirect(new URL('/auth/login', request.url));
-      response.cookies.set('auth-token', '', { maxAge: 0, path: '/' });
+      response.cookies.delete('auth-token');
       return response;
     }
   }
 
-  // For API routes (except auth routes), check authentication
+  // 4. Protect API Routes (excluding the public auth ones handled above)
   if (pathname.startsWith('/api') && !pathname.startsWith('/api/auth')) {
     if (!token) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
     try {
       jwt.verify(token, JWT_SECRET);
       return NextResponse.next();
     } catch (error) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
   }
 
@@ -82,7 +84,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public (public files)
+     * - public (public folder)
      */
     '/((?!_next/static|_next/image|favicon.ico|public).*)',
   ],

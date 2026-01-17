@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -251,7 +252,7 @@ export default function Dashboard() {
     <AdminLayout user={user}>
       <div className="space-y-8 max-w-7xl mx-auto">
         {/* Welcome */}
-        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-slate-900 via-slate-800 to-teal-900 p-10 text-white shadow-2xl shadow-slate-200">
+        <div className="relative overflow-hidden rounded-4xl bg-linear-to-r from-slate-900 via-slate-800 to-teal-900 p-10 text-white shadow-2xl shadow-slate-200">
           <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-teal-500 rounded-full blur-[100px] opacity-20"></div>
           <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -261,7 +262,7 @@ export default function Dashboard() {
                 You have <span className="text-white font-semibold underline decoration-teal-500 underline-offset-4">3 high-priority</span> scans requiring review.
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/10 p-4 rounded-xl min-w-[200px]">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/10 p-4 rounded-xl min-w-50">
               <div className="text-xs text-slate-400 uppercase tracking-wider font-semibold mb-1">Current Model</div>
               <div className="text-xl font-bold flex items-center gap-2">
                 ISIC-ResNet50 <span className="flex h-2 w-2 rounded-full bg-green-400 shadow-[0_0_10px_#4ade80]"></span>

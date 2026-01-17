@@ -97,6 +97,11 @@ export default function SmartScanLanding() {
         .animate-float-delayed { animation: float 6s ease-in-out infinite 2s; }
         .animate-gradient { background: conic-gradient(from 0deg, #eab308, #7f1d1d, #eab308); background-clip: text; -webkit-background-clip: text; animation: 3s linear infinite; }
       `}</style>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-teal-100/40 rounded-full blur-3xl mix-blend-multiply"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100/40 rounded-full blur-3xl mix-blend-multiply"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
+      </div>
 
       <Navbar />
 
@@ -183,6 +188,7 @@ export default function SmartScanLanding() {
       </section>
 
       {/* --- DATASET --- */}
+      
       <section id="science" className="py-24 bg-slate-900 text-white overflow-hidden relative">
         <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
         <div className="container mx-auto px-6 relative z-10">
