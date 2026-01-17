@@ -88,7 +88,7 @@ const StatBadge = ({ value, label }: StatBadgeProps) => (
 // --- Main Landing Page ---
 export default function SmartScanLanding() {
   return (
-    <div className="min-h-screen bg-white font-sans selection:bg-teal-100 selection:text-teal-900">
+    <div className="min-h-screen bg-white poppins-regular selection:bg-teal-100 selection:text-teal-900">
       <style>{`
         @keyframes scan {0% { top: 10%; opacity: 0; }10% { opacity: 1; }90% { opacity: 1; }100% { top: 90%; opacity: 0; }}
         @keyframes float {0%,100% { transform: translateY(0px); }50% { transform: translateY(-10px); }}
