@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartscan_postgres
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: smartscan_secure_password
+      POSTGRES_DB: smartscan_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartscan_network
+
+  admin_web:
+    build: .
+    container_name: smartscan_admin_web
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://admin:smartscan_secure_password@postgres:5432/smartscan_db
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    ports:
+      - "3001:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - smartscan_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  smartscan_network:
+    driver: bridge

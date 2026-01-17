@@ -1,26 +1,46 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+*{
+  scroll-behavior: smooth;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root {
+  /* Medical-grade palette - softer purple and blue */
+  --primary: #7c3aed; /* purple-600 - softer purple */
+  --primary-600: #2563eb; /* blue-600 - professional blue */
+  --accent: #a855f7; /* purple-500 - lighter purple */
+  --bg: #f8fafc; /* slate-50 */
+  --card: #ffffff;
+  --muted: #64748b;
+}
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #021627;
+    --card: #02293a;
+    --color-foreground: #e6eef6;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--color-foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Small utility for subtle card */
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(16,24,40,0.06);
+}
+
+.hint {
+  color: var(--muted);
 }
